@@ -1,0 +1,36 @@
+{% extends 'main/base.html' %}
+
+{% block app_content %}
+{% if questions %}
+    {% if questions %}
+        <h1>TAG: {{questions[0].tag}}</h1>
+    {% endif %}
+        {% for question in questions %}
+            <p>
+                {% set link = question.link | replace('*','/') %}
+                {% set link = link[1:] %}
+                {% set id = link.split('/')[1] %}
+                {% set ques = link.split('/')[2] %}
+                 <a href="{{url_for('main.show_answer', question = ques, id = id )}}">{{ question.tag|title }}: {{question.question}}</a>
+            </p>
+        {% endfor %}
+        <nav aria-label="...">
+            <ul class="pager">
+                <li class="previous{% if not prev_url %} disabled{% endif %}">
+                    <a href="{{ prev_url or '#' }}">
+                        <span aria-hidden="true">&larr;</span> Newer posts
+                    </a>
+                </li>
+                <li class="next{% if not next_url %} disabled{% endif %}">
+                    <a href="{{ next_url or '#' }}">
+                        Older posts <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    {% else %}
+        <div>
+            <h1>There is no question</h1>
+        </div>
+    {% endif %}
+{%endblock%}
