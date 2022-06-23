@@ -9,7 +9,7 @@ from app import db
 @bp.route('/')
 def index():
     page = request.args.get('page', 1, type=int)
-    questions = models.Questions.query.paginate(page, current_app.config['POSTS_PER_PAGE'], False)
+    questions = models.Questions.query.order_by(models.Questions.question).paginate(page, current_app.config['POSTS_PER_PAGE'], False)
     next_url = url_for('main.index', page=questions.next_num) if questions.has_next else None
     prev_url = url_for('main.index', page=questions.prev_num) if questions.has_prev else None
     return render_template('main/index.html', questions = questions.items, next_url = next_url, prev_url = prev_url)
