@@ -1,3 +1,4 @@
+from crypt import methods
 from bs4 import Tag
 from app.main import bp
 from flask import jsonify, render_template, request, url_for, current_app
@@ -39,3 +40,13 @@ def add(tag):
         return jsonify({'message': 'Question added successfully'})
     return jsonify({'message': 'Question not added'})
 
+@bp.route('/api/questions/<tag>', methods=['GET'])
+def question(tag):
+    questions = models.Questions.query.filter_by(tag=tag).all()
+    if questions:
+        question = [{'question': question.question, 'url': f"https://stackoverflow.com/questions{question.link.replace('*','/')}"} for question in questions]
+        return jsonify(question)
+    return jsonify([{
+                        "tag": tag,
+                        "message": "There is no question related with this tag"
+                   }])
