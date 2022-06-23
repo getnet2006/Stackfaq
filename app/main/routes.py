@@ -17,7 +17,7 @@ def index():
 @bp.route('/<tag>')
 def show_question(tag):
     page = request.args.get('page', 1, type=int)
-    questions=models.Questions.query.filter_by(tag=tag).paginate(page, 15, False)
+    questions=models.Questions.query.filter_by(tag=tag).paginate(page, current_app.config['POSTS_PER_PAGE'], False)
     next_url = url_for('main.index', page=questions.next_num) if questions.has_next else None
     prev_url = url_for('main.index', page=questions.prev_num) if questions.has_prev else None
     return render_template('main/index.html', questions = questions.items, next_url = next_url, prev_url = prev_url)
