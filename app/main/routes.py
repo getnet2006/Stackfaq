@@ -29,24 +29,27 @@ def show_answer(question, id):
     answer = util.answer(link)
     return render_template('main/show.html', answer=answer)
 
-@bp.route('/api/<tag>', methods= ['GET','POST'])
-def add(tag):
-    questions = util.freq_questions(tag)
-    if questions:
-        for question in questions:
-            q1 = models.Questions(question = question['title'], link = question['link'], tag = tag)
-            db.session.add(q1)
-            db.session.commit()
-        return jsonify({'message': 'Question added successfully'})
-    return jsonify({'message': 'Question not added'})
+@bp.post('/questions')
+def add():
+    if request.is_json:
+        tag = request.get_json()['tag']
+        questions = util.freq_questions(tag)
+        if questions:
+            for question in questions:
+                q1 = models.Questions(question = question['title'], link = question['link'], tag = tag)
+                db.session.add(q1)
+                db.session.commit()
+            return jsonify({'message': 'New Question added Successfully!'}), 201
+    return jsonify({'message': 'Question not added'}), 415
 
-@bp.route('/api/questions/<tag>', methods=['GET'])
-def question(tag):
-    questions = models.Questions.query.filter_by(tag=tag).all()
-    if questions:
-        question = [{'question': question.question, 'url': f"https://stackoverflow.com/questions{question.link.replace('*','/')}"} for question in questions]
-        return jsonify(question)
-    return jsonify([{
-                        "tag": tag,
+@bp.get('/questions')
+def question():
+    if request.is_json:
+        tag = request.get_json()['tag']
+        questions = models.Questions.query.filter_by(tag=tag).all()
+        if questions:
+            questions = [{'question': question.question, 'url': f"https://stackoverflow.com/questions{question.link.replace('*','/')}"} for question in questions]
+            return jsonify(questions)
+    return jsonify({
                         "message": "There is no question related with this tag"
-                   }])
+                   }), 415
